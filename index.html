@@ -127,6 +127,8 @@ a{color:var(--accent);font-weight:600;}
 .hefter-fb{font-size:var(--fs-sm);color:var(--text-3);margin-left:8px;}
 .hefter-box table{border-collapse:collapse;margin-top:8px;}
 .hefter-box td{padding:3px 10px 3px 0;font-size:var(--fs-base);color:var(--text-2);}
+.hefter-box code, p code{font-family:var(--mono);font-size:.92em;background:var(--surface-2);
+  border:1px solid var(--border);border-radius:5px;padding:1px 6px;}
 
 /* ── Codebeispiele ── */
 .code-wrap{position:relative;margin:10px 0 0;}
@@ -165,13 +167,24 @@ a{color:var(--accent);font-weight:600;}
   line-height:1.7;transition:padding .28s ease;}
 .acc-head.open + .acc-body .acc-body-inner{padding:10px 14px;}
 
+/* ── Reiter-Navigation (weitere Reiter folgen künftig) ── */
+.phase-nav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+.pnav{display:flex;flex-direction:column;gap:2px;align-items:flex-start;background:var(--surface);
+  border:1.5px solid var(--border);border-radius:var(--radius);padding:8px 14px;cursor:pointer;
+  font-family:var(--font);font-size:var(--fs-base);font-weight:600;color:var(--text-2);}
+.pnav:hover{border-color:var(--accent-muted);}
+.pnav.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.pnum{font-size:var(--fs-sm);font-weight:700;opacity:.75;text-transform:uppercase;letter-spacing:.06em;}
+.phase{display:none;} .phase.on{display:block;}
+
 /* ── Fußnotiz für künftige Kategorien ── */
 .platzhalter{border:2px dashed var(--border);border-radius:var(--radius);padding:16px 20px;
   color:var(--text-3);font-size:var(--fs-base);text-align:center;margin-bottom:16px;}
 
 @media print{
   body{background:#fff;padding:0;}
-  .suchbox,.hefter-btn,.sammel-leiste,.toc-nav{display:none !important;}
+  .suchbox,.hefter-btn,.sammel-leiste,.toc-nav,.phase-nav{display:none !important;}
+  .phase{display:block !important;}
   .card{box-shadow:none;break-inside:avoid;}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important;}}
@@ -185,6 +198,17 @@ a{color:var(--accent);font-weight:600;}
     <h1>Unsere Python-Werkzeugkiste</h1>
     <div class="goal">📚 <span>Hier sammeln wir alle Python-Befehle und Konzepte, die wir im Unterricht besprochen haben. Diese Seite wächst mit jeder Stunde weiter und ist dein Nachschlagewerk anstelle des Heftereintrags.</span></div>
   </header>
+
+  <!-- ============================================================
+       REITER-NAVIGATION
+       Für jeden neuen Reiter hier einen weiteren <button class="pnav">
+       ergänzen (nächste id: pn1) und unten eine neue <section class="phase" id="ph1">.
+       ============================================================ -->
+  <nav class="phase-nav" id="phase-nav">
+    <button class="pnav active" id="pn0" onclick="showPhase(0)"><span class="pnum">Reiter</span>Grundlagen</button>
+  </nav>
+
+  <section class="phase on" id="ph0">
 
   <div class="suchbox">
     🔍 <input type="text" id="suche" placeholder="Begriff oder Befehl suchen …" oninput="filterKarten()">
@@ -200,6 +224,7 @@ a{color:var(--accent);font-weight:600;}
     <a class="toc-link" href="#kat-grundlagen">🧩 Grundlagen</a>
     <a class="toc-link" href="#kat-algorithmus">🔍 Eigenschaften eines Algorithmus</a>
     <a class="toc-link" href="#kat-variablen">📦 Variablen</a>
+    <a class="toc-link" href="#kat-datentypen">🔤 Datentypen</a>
     <span class="toc-link leer">+ weitere Kategorien folgen</span>
   </nav>
 
@@ -231,51 +256,18 @@ a{color:var(--accent);font-weight:600;}
     <section class="kategorie" id="kat-algorithmus">
       <h2>🔍 Eigenschaften eines Algorithmus</h2>
 
-      <!-- ---------- Eigenschaft: Eindeutigkeit ---------- -->
-      <div class="card" data-suchtext="eindeutigkeit determinismus deterministisch nächste anweisung eigenschaft algorithmus">
+      <!-- ---------- Die vier Eigenschaften — zusammengefasst in EINER Box ---------- -->
+      <div class="card" data-suchtext="eindeutigkeit determinismus ausführbarkeit allgemeingültigkeit endlichkeit terminiertheit eigenschaften algorithmus">
         <div class="card-head">
-          <h3>Eindeutigkeit (Determinismus)</h3>
-          <span class="badge">Eigenschaft</span>
+          <h3>Die vier Eigenschaften eines Algorithmus</h3>
+          <span class="badge">Merksatz</span>
         </div>
         <div class="hefter-box">
           <div class="hefter-label">📓 Definition</div>
-          <p>Die nächste Anweisung in der Schrittfolge ist zu jedem Zeitpunkt <strong>eindeutig definiert</strong>.</p>
-        </div>
-      </div>
-
-      <!-- ---------- Eigenschaft: Ausführbarkeit ---------- -->
-      <div class="card" data-suchtext="ausführbarkeit verständlich befehlsempfänger eigenschaft algorithmus">
-        <div class="card-head">
-          <h3>Ausführbarkeit</h3>
-          <span class="badge">Eigenschaft</span>
-        </div>
-        <div class="hefter-box">
-          <div class="hefter-label">📓 Definition</div>
-          <p>Jeder Schritt des Verfahrens ist für den <span class="tt" data-tip="Die Person, das Gerät oder das Programm, das die Anweisungen ausführt.">Befehlsempfänger</span> <strong>verständlich</strong>.</p>
-        </div>
-      </div>
-
-      <!-- ---------- Eigenschaft: Allgemeingültigkeit ---------- -->
-      <div class="card" data-suchtext="allgemeingültigkeit gleichartige probleme eigenschaft algorithmus">
-        <div class="card-head">
-          <h3>Allgemeingültigkeit</h3>
-          <span class="badge">Eigenschaft</span>
-        </div>
-        <div class="hefter-box">
-          <div class="hefter-label">📓 Definition</div>
-          <p>Es können <strong>viele gleichartige Probleme</strong> gelöst werden.</p>
-        </div>
-      </div>
-
-      <!-- ---------- Eigenschaft: Endlichkeit ---------- -->
-      <div class="card" data-suchtext="endlichkeit terminiertheit terminierung schrittfolge endet lösung eigenschaft algorithmus">
-        <div class="card-head">
-          <h3>Endlichkeit (Terminiertheit)</h3>
-          <span class="badge">Eigenschaft</span>
-        </div>
-        <div class="hefter-box">
-          <div class="hefter-label">📓 Definition</div>
-          <p>Die Schrittfolge <strong>endet</strong> und liefert eine <strong>Lösung</strong> des Problems.</p>
+          <p><strong>Eindeutigkeit (Determinismus):</strong> Die nächste Anweisung in der Schrittfolge ist zu jedem Zeitpunkt eindeutig definiert.</p>
+          <p><strong>Ausführbarkeit:</strong> Jeder Schritt des Verfahrens ist für den <span class="tt" data-tip="Die Person, das Gerät oder das Programm, das die Anweisungen ausführt.">Befehlsempfänger</span> verständlich.</p>
+          <p><strong>Allgemeingültigkeit:</strong> Es können viele gleichartige Probleme gelöst werden.</p>
+          <p><strong>Endlichkeit (Terminiertheit):</strong> Die Schrittfolge endet und liefert eine Lösung des Problems.</p>
         </div>
       </div>
 
@@ -351,7 +343,10 @@ a{color:var(--accent);font-weight:600;}
         <div class="hefter-box">
           <div class="hefter-label">📓 Definition</div>
           <p><span class="tt" data-tip="Ein benannter Speicherplatz im Arbeitsspeicher, unter dem ein Wert abgelegt wird.">Variablen</span> sind die Bausteine, die es ermöglichen, Daten zu <strong>speichern</strong>, zu <strong>manipulieren</strong> und auf sie <strong>zuzugreifen</strong>.</p>
+          <p>Eine Variable besteht dabei immer aus zwei Teilen: einem <strong>Variablennamen</strong> und einem <strong>Variablenwert</strong> (z. B. <code>alter = 16</code> → Name: <code>alter</code>, Wert: <code>16</code>).</p>
         </div>
+
+        <div class="callout callout-info">📝 <span><strong>Regel für Variablennamen:</strong> Variablennamen werden immer <strong>kleingeschrieben</strong> und beginnen immer mit einem <strong>Buchstaben</strong> (nie mit einer Zahl oder einem Sonderzeichen).</span></div>
 
         <p class="code-label">1 · Speichern — einer Variable einen Wert zuweisen</p>
         <div class="code-wrap">
@@ -380,18 +375,98 @@ print(punkte)</div>
     </section>
 
     <!-- ============================================================
+         KATEGORIE: Datentypen
+         ============================================================ -->
+    <section class="kategorie" id="kat-datentypen">
+      <h2>🔤 Datentypen</h2>
+
+      <!-- ---------- Datentyp: String ---------- -->
+      <div class="card" data-suchtext="string str text zeichenkette datentyp python">
+        <div class="card-head">
+          <h3>String <code>str</code></h3>
+          <span class="badge">Datentyp</span>
+        </div>
+        <div class="hefter-box">
+          <div class="hefter-label">📓 Erklärung</div>
+          <p>Ein <strong>String</strong> ist eine Zeichenkette, also ein Text. Er wird in Python immer in Anführungszeichen (<code>"…"</code> oder <code>'…'</code>) geschrieben.</p>
+        </div>
+        <div class="code-wrap">
+          <div class="code">name = "Anna"
+print(name)</div>
+          <button class="code-copy-btn">📋 kopieren</button>
+        </div>
+      </div>
+
+      <!-- ---------- Datentyp: Integer ---------- -->
+      <div class="card" data-suchtext="integer int ganze zahl zahlen datentyp python">
+        <div class="card-head">
+          <h3>Integer <code>int</code></h3>
+          <span class="badge">Datentyp</span>
+        </div>
+        <div class="hefter-box">
+          <div class="hefter-label">📓 Erklärung</div>
+          <p>Ein <strong>Integer</strong> ist eine <strong>ganze Zahl</strong> — also eine Zahl ohne Nachkommastellen (auch negativ möglich).</p>
+        </div>
+        <div class="code-wrap">
+          <div class="code">alter = 15
+print(alter)</div>
+          <button class="code-copy-btn">📋 kopieren</button>
+        </div>
+      </div>
+
+      <!-- ---------- Datentyp: Float ---------- -->
+      <div class="card" data-suchtext="float gleitkommazahl kommazahl nachkommastellen datentyp python">
+        <div class="card-head">
+          <h3>Float <code>float</code></h3>
+          <span class="badge">Datentyp</span>
+        </div>
+        <div class="hefter-box">
+          <div class="hefter-label">📓 Erklärung</div>
+          <p>Ein <strong>Float</strong> ist eine <strong>Kommazahl</strong> — eine Zahl mit Nachkommastellen. In Python wird dabei ein <strong>Punkt</strong> statt eines Kommas verwendet.</p>
+        </div>
+        <div class="code-wrap">
+          <div class="code">groesse = 1.65
+print(groesse)</div>
+          <button class="code-copy-btn">📋 kopieren</button>
+        </div>
+      </div>
+
+      <!-- ---------- Datentyp: Boolean ---------- -->
+      <div class="card" data-suchtext="boolean bool wahrheitswert true false datentyp python">
+        <div class="card-head">
+          <h3>Boolean <code>bool</code></h3>
+          <span class="badge">Datentyp</span>
+        </div>
+        <div class="hefter-box">
+          <div class="hefter-label">📓 Erklärung</div>
+          <p>Ein <strong>Boolean</strong> ist ein <strong>Wahrheitswert</strong> — er kann nur genau zwei Zustände annehmen: <code>True</code> oder <code>False</code>.</p>
+        </div>
+        <div class="code-wrap">
+          <div class="code">ist_wach = True
+print(ist_wach)</div>
+          <button class="code-copy-btn">📋 kopieren</button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============================================================
          WEITERE KATEGORIEN
          Neue <section class="kategorie" id="kat-…"> nach demselben Muster
-         ergänzen (z. B. Datentypen, Verzweigungen, Schleifen, Funktionen,
-         Listen). Jede Karte braucht:
+         ergänzen (z. B. Verzweigungen, Schleifen, Funktionen, Listen).
+         Jede Karte braucht:
          - data-suchtext (alle Suchbegriffe klein geschrieben)
-         - hefter-box mit der Definition/Merksatz
+         - hefter-box mit der Definition/Erklärung (auch kurze Erklärungen
+           gehören in eine hefter-box, damit sie in den Sammel-Button
+           "Gesamte Sammlung kopieren" einbezogen werden)
          - optional <div class="code-wrap"><div class="code">…</div>
            <button class="code-copy-btn">📋 kopieren</button></div> für Code
          ============================================================ -->
-    <div class="platzhalter">Weitere Kategorien (z. B. Datentypen, Schleifen, Funktionen) werden hier ergänzt, sobald wir sie im Unterricht behandelt haben.</div>
+    <div class="platzhalter">Weitere Kategorien (z. B. Verzweigungen, Schleifen, Funktionen) werden hier ergänzt, sobald wir sie im Unterricht behandelt haben.</div>
 
   </main>
+
+  </section>
 
   <div class="sammel-leiste">
     <button class="btn btn-ghost" id="hefter-all">📋 Gesamte Sammlung in den Hefter kopieren</button>
@@ -400,6 +475,13 @@ print(punkte)</div>
 </div>
 
 <script>
+/* ---------- Reiter (Phasen) ---------- */
+function showPhase(n){
+  document.querySelectorAll('.phase').forEach(s => s.classList.toggle('on', s.id === 'ph'+n));
+  document.querySelectorAll('.pnav').forEach(b => b.classList.toggle('active', b.id === 'pn'+n));
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
 /* ---------- Akkordeon (Reserve für spätere Begriffe) ---------- */
 function toggleAcc(btn){ btn.setAttribute('aria-expanded', btn.classList.toggle('open')); }
 

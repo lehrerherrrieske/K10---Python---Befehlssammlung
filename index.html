@@ -92,9 +92,6 @@ a{color:var(--accent);font-weight:600;}
 
 /* ── Tooltip für Fachbegriffe ── */
 .tt{border-bottom:1.5px dotted var(--accent-muted);cursor:help;position:relative;}
-.tt:hover::after,.tt:focus::after{content:attr(data-tip);position:absolute;left:0;top:130%;z-index:20;
-  width:max-content;max-width:280px;background:var(--color-text);color:#fff;font-size:var(--fs-sm);
-  font-weight:400;line-height:1.45;padding:8px 11px;border-radius:8px;box-shadow:var(--shadow-md);}
 
 /* ── Callouts (Inhalt IMMER in EIN <span> wickeln) ── */
 .callout{display:flex;gap:10px;align-items:flex-start;padding:12px 15px;margin:12px 0;
@@ -177,6 +174,19 @@ a{color:var(--accent);font-weight:600;}
 .pnum{font-size:var(--fs-sm);font-weight:700;opacity:.75;text-transform:uppercase;letter-spacing:.06em;}
 .phase{display:none;} .phase.on{display:block;}
 
+/* ── Klickbare Fachbegriffe (Hover-Erklärung + Sprung zur Definition) ── */
+.fach{font-family:var(--mono);font-size:.92em;background:var(--surface-2);border:1px solid var(--accent-muted);
+  border-radius:5px;padding:1px 6px;color:var(--accent-hover);text-decoration:none;cursor:pointer;position:relative;}
+.fach:hover{background:var(--accent-light);}
+.fach-highlight{animation:fach-flash 1.6s ease;}
+@keyframes fach-flash{0%{box-shadow:0 0 0 4px var(--accent-muted);}100%{box-shadow:none;}}
+
+/* ── Globales Tooltip-Popup (fixed, entkommt jedem overflow:hidden) ── */
+#tt-popup{position:fixed;z-index:1000;display:none;max-width:260px;width:max-content;
+  background:var(--color-text);color:#fff;font-size:var(--fs-sm);font-weight:400;line-height:1.45;
+  padding:8px 11px;border-radius:8px;box-shadow:var(--shadow-md);pointer-events:none;}
+#tt-popup.show{display:block;}
+
 /* ── PAP-Beispieldiagramm ── */
 .pap-diagramm{max-width:420px;margin:10px auto 0;}
 .pap-diagramm svg{display:block;width:100%;height:auto;}
@@ -225,13 +235,28 @@ a{color:var(--accent);font-weight:600;}
 .pap-content{flex:1;min-width:220px;}
 .pap-content p{margin-bottom:0;color:var(--text-2);}
 
+/* ── Lehrermodus-Leiste ── */
+.lehrer-bar{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;
+  background:var(--surface-2);border-bottom:1.5px solid var(--border);padding:8px 16px;
+  font-family:var(--font);font-size:var(--fs-sm);}
+.lehrer-label{font-weight:700;color:var(--text-2);}
+.lehrer-bar input{font-family:var(--font);font-size:var(--fs-sm);padding:5px 12px;
+  border:1.5px solid var(--border);border-radius:var(--radius-full);background:var(--surface);color:var(--text);}
+.lehrer-status{font-weight:700;color:var(--text-3);}
+.lehrer-status.aktiv{color:var(--ok);}
+.lehrer-status.fehler{color:var(--err);}
+body.lehrermodus-aktiv .lehrer-bar{background:var(--ok-bg);border-bottom-color:var(--ok);}
+body.lehrermodus-aktiv .hilfe-trigger{display:none;}
+.lehrer-nur-aktiv{display:none;}
+body.lehrermodus-aktiv .lehrer-nur-aktiv{display:inline-block;}
+
 /* ── Fußnotiz für künftige Kategorien ── */
 .platzhalter{border:2px dashed var(--border);border-radius:var(--radius);padding:16px 20px;
   color:var(--text-3);font-size:var(--fs-base);text-align:center;margin-bottom:16px;}
 
 @media print{
   body{background:#fff;padding:0;}
-  .suchbox,.hefter-btn,.sammel-leiste,.toc-nav,.phase-nav{display:none !important;}
+  .suchbox,.hefter-btn,.sammel-leiste,.toc-nav,.phase-nav,.lehrer-bar{display:none !important;}
   .phase{display:block !important;}
   .card{box-shadow:none;break-inside:avoid;}
 }
@@ -239,6 +264,13 @@ a{color:var(--accent);font-weight:600;}
 </style>
 </head>
 <body>
+<div class="lehrer-bar" id="lehrer-bar">
+  <span class="lehrer-label">Lehrermodus</span>
+  <input type="password" id="lehrer-pw" placeholder="Passwort" onkeydown="if(event.key==='Enter'){aktiviereLehrermodus();}">
+  <button class="btn btn-primary btn-sm" onclick="aktiviereLehrermodus()">Aktivieren</button>
+  <button class="btn btn-ghost btn-sm lehrer-nur-aktiv" onclick="deaktiviereLehrermodus()">Deaktivieren</button>
+  <span class="lehrer-status" id="lehrer-status">inaktiv</span>
+</div>
 <div class="wrap">
 
   <header class="pagehead">
@@ -390,7 +422,7 @@ a{color:var(--accent);font-weight:600;}
       <div class="kategorie-body">
 
       <!-- ---------- Begriff: Variable ---------- -->
-      <div class="card" data-suchtext="variable variablen daten speichern manipulieren zugreifen bausteine python">
+      <div class="card" id="def-variable" data-suchtext="variable variablen daten speichern manipulieren zugreifen bausteine python">
         <div class="card-head">
           <h3>Variable</h3>
           <span class="badge">Konzept</span>
@@ -438,7 +470,7 @@ print(punkte)</div>
       <div class="kategorie-body">
 
       <!-- ---------- Datentyp: String ---------- -->
-      <div class="card" data-suchtext="string str text zeichenkette datentyp python">
+      <div class="card" id="def-str" data-suchtext="string str text zeichenkette datentyp python">
         <div class="card-head">
           <h3>String <code>str</code></h3>
           <span class="badge">Datentyp</span>
@@ -455,7 +487,7 @@ print(name)</div>
       </div>
 
       <!-- ---------- Datentyp: Integer ---------- -->
-      <div class="card" data-suchtext="integer int ganze zahl zahlen datentyp python">
+      <div class="card" id="def-int" data-suchtext="integer int ganze zahl zahlen datentyp python">
         <div class="card-head">
           <h3>Integer <code>int</code></h3>
           <span class="badge">Datentyp</span>
@@ -472,7 +504,7 @@ print(alter)</div>
       </div>
 
       <!-- ---------- Datentyp: Float ---------- -->
-      <div class="card" data-suchtext="float gleitkommazahl kommazahl nachkommastellen datentyp python">
+      <div class="card" id="def-float" data-suchtext="float gleitkommazahl kommazahl nachkommastellen datentyp python">
         <div class="card-head">
           <h3>Float <code>float</code></h3>
           <span class="badge">Datentyp</span>
@@ -489,7 +521,7 @@ print(groesse)</div>
       </div>
 
       <!-- ---------- Datentyp: Boolean ---------- -->
-      <div class="card" data-suchtext="boolean bool wahrheitswert true false datentyp python">
+      <div class="card" id="def-bool" data-suchtext="boolean bool wahrheitswert true false datentyp python">
         <div class="card-head">
           <h3>Boolean <code>bool</code></h3>
           <span class="badge">Datentyp</span>
@@ -506,7 +538,7 @@ print(ist_wach)</div>
       </div>
 
       <!-- ---------- Datentyp: Liste ---------- -->
-      <div class="card" data-suchtext="liste list datentyp python index indexierung adressierung append remove count methoden neue inhalte">
+      <div class="card" id="def-liste" data-suchtext="liste list datentyp python index indexierung adressierung append remove count methoden neue inhalte">
         <div class="card-head">
           <h3>Liste <code>list</code></h3>
           <span class="badge">Datentyp</span>
@@ -827,11 +859,11 @@ print(meine_liste.count("Apfel"))</div>
             <p><strong>Situation:</strong> Du erstellst ein Spielerprofil für ein Online-Spiel.</p>
 
             <div class="niveau">
-              <p><span class="aufgaben-nr">1.1</span>Lege Variablen für deinen Spielernamen (<code>str</code>), dein Alter (<code>int</code>) und deine Größe in Metern (<code>float</code>) an. Gib alle drei mit <code>print()</code> aus.</p>
+              <p><span class="aufgaben-nr">1.1</span>Lege Variablen für deinen Spielernamen (<a class="fach" href="#def-str" onclick="gotoBegriff(event,0,'def-str')" data-tip="String: speichert Text, z. B. &quot;Nova_07&quot;.">str</a>), dein Alter (<a class="fach" href="#def-int" onclick="gotoBegriff(event,0,'def-int')" data-tip="Integer: eine ganze Zahl ohne Nachkommastellen.">int</a>) und deine Größe in Metern (<a class="fach" href="#def-float" onclick="gotoBegriff(event,0,'def-float')" data-tip="Float: eine Kommazahl mit Nachkommastellen.">float</a>) an. Gib alle drei mit <code>print()</code> aus.</p>
             </div>
 
             <div class="niveau">
-              <p><span class="aufgaben-nr">1.2</span>Ergänze dein Lieblingsspiel und dein Level (<code>int</code>). Gestalte die Ausgabe als Profilkarte, zum Beispiel so:</p>
+              <p><span class="aufgaben-nr">1.2</span>Ergänze dein Lieblingsspiel und dein Level (<a class="fach" href="#def-int" onclick="gotoBegriff(event,0,'def-int')" data-tip="Integer: eine ganze Zahl ohne Nachkommastellen.">int</a>). Gestalte die Ausgabe als Profilkarte, zum Beispiel so:</p>
               <div class="code">=========================
  Spieler: Nova_07
  Alter:   14
@@ -1039,8 +1071,115 @@ function showPhase(n){
   window.scrollTo({ top:0, behavior:'smooth' });
 }
 
+/* ---------- Lehrermodus ---------- */
+const LEHRER_PW = 'InfoIstCool';
+function setLehrermodus(an){
+  document.body.classList.toggle('lehrermodus-aktiv', an);
+  const status = document.getElementById('lehrer-status');
+  if(status){
+    status.textContent = an ? 'aktiv' : 'inaktiv';
+    status.classList.toggle('aktiv', an);
+    status.classList.remove('fehler');
+  }
+  if(an){
+    document.querySelectorAll('.hilfe-box').forEach(box=>{
+      box.classList.add('on');
+      if(box._hilfeInterval){ clearInterval(box._hilfeInterval); box._hilfeInterval=null; }
+      box.querySelectorAll('.hilfe-btn').forEach(btn=>{
+        btn.disabled=false;
+        const t=btn.querySelector('.hilfe-timer'); if(t) t.textContent='';
+      });
+    });
+  }
+}
+function aktiviereLehrermodus(){
+  const feld = document.getElementById('lehrer-pw');
+  const status = document.getElementById('lehrer-status');
+  if(feld.value === LEHRER_PW){
+    try{ localStorage.setItem('lehrermodus','1'); }catch(e){}
+    setLehrermodus(true);
+  } else {
+    status.textContent = 'falsches Passwort';
+    status.classList.remove('aktiv');
+    status.classList.add('fehler');
+  }
+  feld.value='';
+}
+function deaktiviereLehrermodus(){
+  try{ localStorage.removeItem('lehrermodus'); }catch(e){}
+  setLehrermodus(false);
+  resetHilfeBoxen();
+}
+function resetHilfeBoxen(){
+  document.querySelectorAll('.hilfe-box').forEach(box=>{
+    box.classList.remove('on');
+    delete box.dataset.started;
+    delete box.dataset.startTime;
+    if(box._hilfeInterval){ clearInterval(box._hilfeInterval); box._hilfeInterval=null; }
+    box.querySelectorAll('.hilfe-btn').forEach(btn=>{
+      btn.disabled=true;
+      const t=btn.querySelector('.hilfe-timer'); if(t) t.textContent='';
+    });
+    const trigger = box.previousElementSibling;
+    if(trigger && trigger.classList.contains('hilfe-trigger')){
+      trigger.disabled=false;
+      trigger.textContent='Hilfestellungen';
+    }
+  });
+}
+function initLehrermodus(){
+  let gespeichert=false;
+  try{ gespeichert = localStorage.getItem('lehrermodus')==='1'; }catch(e){}
+  if(gespeichert) setLehrermodus(true);
+}
+
 /* ---------- Einklappbare Oberkategorien (Reiter 01) ---------- */
 function toggleKategorie(btn){ btn.classList.toggle('open'); }
+
+/* ---------- Klickbarer Fachbegriff: Reiter wechseln + zur Definition springen ---------- */
+function gotoBegriff(ev, phase, id){
+  ev.preventDefault();
+  showPhase(phase);
+  setTimeout(()=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    const kopf = el.closest('.kategorie') && el.closest('.kategorie').querySelector('.kategorie-head');
+    if(kopf) kopf.classList.add('open');
+    el.scrollIntoView({behavior:'smooth', block:'center'});
+    el.classList.add('fach-highlight');
+    setTimeout(()=>el.classList.remove('fach-highlight'), 1600);
+  }, 60);
+}
+
+/* ---------- Globales Tooltip-Popup (für .tt und .fach, entkommt overflow:hidden) ---------- */
+function initTooltips(){
+  const popup = document.getElementById('tt-popup');
+  if(!popup) return;
+  const positioniere = (el)=>{
+    const tip = el.getAttribute('data-tip');
+    if(!tip) return;
+    popup.textContent = tip;
+    popup.classList.add('show');
+    const r = el.getBoundingClientRect();
+    const pw = popup.offsetWidth, ph = popup.offsetHeight;
+    let left = r.left, top = r.bottom + 8;
+    if(left + pw > window.innerWidth - 8) left = window.innerWidth - pw - 8;
+    if(left < 8) left = 8;
+    if(top + ph > window.innerHeight - 8) top = r.top - ph - 8;
+    popup.style.left = left + 'px';
+    popup.style.top = top + 'px';
+  };
+  const verstecken = ()=> popup.classList.remove('show');
+  document.querySelectorAll('.tt, .fach').forEach(el=>{
+    if(el.dataset.ttWired) return;
+    el.dataset.ttWired='1';
+    el.addEventListener('mouseenter', ()=>positioniere(el));
+    el.addEventListener('mouseleave', verstecken);
+    el.addEventListener('focus', ()=>positioniere(el));
+    el.addEventListener('blur', verstecken);
+  });
+  window.addEventListener('scroll', verstecken, true);
+}
 
 /* ---------- Akkordeon (Reserve für spätere Begriffe) ---------- */
 function toggleAcc(btn){
@@ -1187,8 +1326,10 @@ function filterKarten(){
 }
 
 /* ---------- Init ---------- */
-function initSeite(){ initHefter(); initCodeCopy(); }
+function initSeite(){ initHefter(); initCodeCopy(); initTooltips(); initLehrermodus(); }
 if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',initSeite); } else { initSeite(); }
 </script>
+
+<div id="tt-popup" role="tooltip"></div>
 </body>
 </html>
